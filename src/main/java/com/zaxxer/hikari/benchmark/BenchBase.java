@@ -17,6 +17,7 @@
 package com.zaxxer.hikari.benchmark;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -27,7 +28,11 @@ import javax.sql.DataSource;
 import com.alibaba.druid.filter.stat.MergeStatFilter;
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.benchmark.base_datasource.BaseDatasource;
+import com.zaxxer.hikari.benchmark.simple_datasource.SimpleDataSource;
+import com.zaxxer.hikari.benchmark.simple_datasource.SimpleJdbcConnectionFactory;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.Validator;
@@ -112,6 +117,12 @@ public class BenchBase
         case "druid-stat-merge":
             setupDruidStatMerge();
             break;
+        case "base":
+            setupBase();
+            break;
+        case "simple":
+            setupSimple();
+            break;
         }
 
     }
@@ -148,7 +159,6 @@ public class BenchBase
         case "druid-stat-merge":
             ((DruidDataSource) DS).close();
             break;
-
         }
     }
 
@@ -252,6 +262,43 @@ public class BenchBase
 
         DS = ds;
     }
+
+
+    protected void setupSimple() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Driver driver = DriverManager.getDriver(jdbcUrl);
+            SimpleJdbcConnectionFactory simpleJdbcConnectionFactory = new SimpleJdbcConnectionFactory(driver);
+            simpleJdbcConnectionFactory.setDefaultAutoCommit(false);
+            simpleJdbcConnectionFactory.setValidationQuery("SELECT 1");
+            GenericObjectPool<Connection> pool = new GenericObjectPool<Connection>(simpleJdbcConnectionFactory);
+            pool.setMaxIdle(maxPoolSize);
+            pool.setMinIdle(MIN_POOL_SIZE);
+            pool.setMaxTotal(maxPoolSize);
+            pool.setTestOnBorrow(true);
+            SimpleDataSource ds = new SimpleDataSource(pool);
+            DS = ds;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    protected void setupBase() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Driver driver = DriverManager.getDriver(jdbcUrl);
+            BaseDatasource ds = new BaseDatasource(driver);
+            ds.setValidationQuery("SELECT 1");
+            DS = ds;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     protected void setupDbcp2()
     {
