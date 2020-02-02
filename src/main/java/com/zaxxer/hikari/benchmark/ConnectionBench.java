@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
+import com.zaxxer.hikari.benchmark.simple_datasource.SimpleDataSource;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.CompilerControl;
@@ -50,7 +51,16 @@ public class ConnectionBench extends BenchBase
     public static Connection cycleCnnection() throws SQLException
     {
         Connection connection = DS.getConnection();
-        connection.close();
+        if (DS instanceof SimpleDataSource) {
+            /**
+             *
+             * 一般数据库连接池的Connection的 close 方法都是return 回 pool
+             * SimpleDatasource是直接返回的真实的Connection, 所以这里特殊处理
+             */
+            ((SimpleDataSource)DS).returnConnection(connection);
+        } else {
+            connection.close();
+        }
         return connection;
     }
 }

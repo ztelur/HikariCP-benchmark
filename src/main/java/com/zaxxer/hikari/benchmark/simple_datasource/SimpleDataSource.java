@@ -21,6 +21,10 @@ public class SimpleDataSource implements DataSource {
         this.pool = pool;
     }
 
+    public void returnConnection(Connection connection) {
+        pool.returnObject(connection);
+    }
+
     @Override
     public Connection getConnection() throws SQLException {
         try {
@@ -70,5 +74,9 @@ public class SimpleDataSource implements DataSource {
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
+    }
+
+    public void close() {
+        pool.close();
     }
 }

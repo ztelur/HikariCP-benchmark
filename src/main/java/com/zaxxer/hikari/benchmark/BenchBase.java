@@ -56,7 +56,7 @@ public class BenchBase
 {
     protected static final int MIN_POOL_SIZE = 0;
 
-    @Param({ "hikari", "dbcp2", "tomcat", "c3p0", "vibur", "druid", "druid-stat", "druid-stat-merge" })
+    @Param({ "hikari", "dbcp2", "tomcat", "c3p0", "vibur", "druid", "druid-stat", "druid-stat-merge","simple", "base" })
     public String pool;
 
     @Param({ "32" })
@@ -66,6 +66,7 @@ public class BenchBase
     public String jdbcUrl;
 
     public static DataSource DS;
+
 
     @Setup(Level.Trial)
     public void setup(BenchmarkParams params)
@@ -84,7 +85,7 @@ public class BenchBase
             System.err.println("# Overriding maxPoolSize paramter for StatementBench: maxPoolSize=" + params.getThreads());
             maxPoolSize = params.getThreads();
         }
-
+        System.out.printf("the pool is " + pool);
         switch (pool)
         {
         case "hikari":
@@ -158,6 +159,10 @@ public class BenchBase
             break;
         case "druid-stat-merge":
             ((DruidDataSource) DS).close();
+            break;
+        case "simple":
+            System.err.printf("init simple2");
+            ((SimpleDataSource) DS).close();
             break;
         }
     }
@@ -266,16 +271,21 @@ public class BenchBase
 
     protected void setupSimple() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            Driver driver = DriverManager.getDriver(jdbcUrl);
+            String URL = "jdbc:mysql://114.67.98.210:3396/sk-admin?useSSL=false&serverTimezone=UTC";
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Driver driver = DriverManager.getDriver(URL);
             SimpleJdbcConnectionFactory simpleJdbcConnectionFactory = new SimpleJdbcConnectionFactory(driver);
             simpleJdbcConnectionFactory.setDefaultAutoCommit(false);
             simpleJdbcConnectionFactory.setValidationQuery("SELECT 1");
+//            simpleJdbcConnectionFactory.setUsername("brettw");
+//            simpleJdbcConnectionFactory.setPassword("");
+//            simpleJdbcConnectionFactory.setUrl(jdbcUrl);
             GenericObjectPool<Connection> pool = new GenericObjectPool<Connection>(simpleJdbcConnectionFactory);
             pool.setMaxIdle(maxPoolSize);
             pool.setMinIdle(MIN_POOL_SIZE);
             pool.setMaxTotal(maxPoolSize);
             pool.setTestOnBorrow(true);
+            pool.setMaxWaitMillis(1000);
             SimpleDataSource ds = new SimpleDataSource(pool);
             DS = ds;
 
@@ -288,8 +298,9 @@ public class BenchBase
 
     protected void setupBase() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            Driver driver = DriverManager.getDriver(jdbcUrl);
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            String URL = "jdbc:mysql://114.67.98.210:3396/sk-admin?useSSL=false&serverTimezone=UTC";
+            Driver driver = DriverManager.getDriver(URL);
             BaseDatasource ds = new BaseDatasource(driver);
             ds.setValidationQuery("SELECT 1");
             DS = ds;

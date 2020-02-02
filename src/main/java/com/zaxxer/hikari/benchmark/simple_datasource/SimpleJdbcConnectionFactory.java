@@ -16,6 +16,9 @@ public class SimpleJdbcConnectionFactory extends BasePooledObjectFactory<Connect
     static final String PASSWORD = "root_test";
     private String validationQuery;
     private boolean defaultAutoCommit;
+    private String username;
+    private String password;
+    private String url;
 
     public SimpleJdbcConnectionFactory(Driver driver) {
         this.driver = driver;
@@ -24,9 +27,10 @@ public class SimpleJdbcConnectionFactory extends BasePooledObjectFactory<Connect
     @Override
     public Connection create() throws Exception {
         Properties props = new Properties();
-        props.put("user", USER_NAME);
-        props.put("password", PASSWORD);
-        Connection connection = driver.connect(URL, props);
+        props.put("user", username != null ? username : USER_NAME);
+        props.put("password", password != null ? password : PASSWORD);
+        String useUrl = this.url != null ? this.url : URL;
+        Connection connection = driver.connect(useUrl, props);
         return connection;
     }
 
@@ -95,5 +99,29 @@ public class SimpleJdbcConnectionFactory extends BasePooledObjectFactory<Connect
 
     public void setDefaultAutoCommit(boolean defaultAutoCommit) {
         this.defaultAutoCommit = defaultAutoCommit;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
