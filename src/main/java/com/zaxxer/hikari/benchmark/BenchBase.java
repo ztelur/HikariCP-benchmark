@@ -56,7 +56,7 @@ public class BenchBase
 {
     protected static final int MIN_POOL_SIZE = 0;
 
-    @Param({ "hikari", "dbcp2", "tomcat", "c3p0", "vibur", "druid", "druid-stat", "druid-stat-merge" })
+    @Param({ "hikari", "dbcp2", "tomcat", "c3p0", "vibur", "druid", "druid-stat", "druid-stat-merge", "simple" })
     public String pool;
 
     @Param({ "32" })
@@ -84,6 +84,7 @@ public class BenchBase
             System.err.println("# Overriding maxPoolSize paramter for StatementBench: maxPoolSize=" + params.getThreads());
             maxPoolSize = params.getThreads();
         }
+
 
         switch (pool)
         {
@@ -266,7 +267,6 @@ public class BenchBase
 
     protected void setupSimple() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             Driver driver = DriverManager.getDriver(jdbcUrl);
             SimpleJdbcConnectionFactory simpleJdbcConnectionFactory = new SimpleJdbcConnectionFactory(driver);
             simpleJdbcConnectionFactory.setDefaultAutoCommit(false);

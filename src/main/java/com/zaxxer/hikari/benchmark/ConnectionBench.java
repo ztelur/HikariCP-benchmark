@@ -49,8 +49,10 @@ public class ConnectionBench extends BenchBase
     @CompilerControl(CompilerControl.Mode.INLINE)
     public static Connection cycleCnnection() throws SQLException
     {
+        System.out.println("cycleCnnection1");
         Connection connection = DS.getConnection();
         connection.close();
+        System.out.println("cycleCnnection2");
         return connection;
     }
 }

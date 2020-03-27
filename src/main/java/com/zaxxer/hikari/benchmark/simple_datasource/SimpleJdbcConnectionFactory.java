@@ -37,6 +37,7 @@ public class SimpleJdbcConnectionFactory extends BasePooledObjectFactory<Connect
 
     @Override
     public PooledObject<Connection> makeObject() throws Exception {
+        System.out.println("makeObject");
         return super.makeObject();
     }
 
