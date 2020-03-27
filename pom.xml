@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>3.1.0</version>
+			<version>3.4.3-test-static</version>
 		</dependency>
 		<!-- dependency> <groupId>io.dropwizard.metrics</groupId> <artifactId>metrics-core</artifactId> 
 			<version>3.1.2</version> </dependency -->
