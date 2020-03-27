@@ -4,9 +4,6 @@
  */
 package com.zaxxer.hikari.benchmark.collection;
 
-import com.zaxxer.hikari.util.ConcurrentBag;
-import com.zaxxer.hikari.util.ConcurrentBag.IBagStateListener;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
